@@ -12,17 +12,23 @@
     .card{background:var(--card);padding:18px;border-radius:10px;box-shadow:0 8px 30px rgba(2,6,23,0.06);border:1px solid rgba(15,23,36,0.04)}
     #map{height:420px;border-radius:8px;background:linear-gradient(180deg,#fff,#f8fbfd);display:flex;align-items:center;justify-content:center;color:var(--muted);border:1px solid #e6eef6}
     footer{max-width:1100px;margin:18px auto;text-align:center;color:var(--muted);font-size:13px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-top:12px}
+    .stat{padding:14px;border-radius:8px;background:linear-gradient(180deg,#ffffff,#fbfdfe);border:1px solid #eef6f8;text-align:center}
+    .stat h3{margin:0;font-size:18px}
+    .stat p{margin:6px 0 0;font-size:14px;color:var(--muted)}
   </style>
 </head>
 <body>
   <header>
     <h1>Travel Risk Dashboard</h1>
-    <p style="color:var(--muted);margin-top:6px">Interactive dashboard — data and charts will appear below.</p>
+    <p style="color:var(--muted);margin-top:6px">Interactive dashboard — example summary data is shown below.</p>
   </header>
   <main id="app">
     <div class="card" id="summary">
       <h2 style="margin-top:0">Summary</h2>
-      <p id="summary-text">No data loaded. Replace this placeholder with your API or local data.</p>
+      <div id="summary-container">
+        <p id="summary-text">Loading summary…</p>
+      </div>
     </div>
 
     <div style="height:18px"></div>
@@ -38,15 +44,47 @@
   </footer>
 
   <script>
-    // Small example: load a JSON from /data/summary.json if present
+    async function renderSummary(data){
+      const container = document.getElementById('summary-container');
+      container.innerHTML = '';
+      const grid = document.createElement('div');
+      grid.className = 'grid';
+
+      const stats = [
+        {label: 'Total countries', value: data.total_countries},
+        {label: 'High risk', value: data.high},
+        {label: 'Medium risk', value: data.medium},
+        {label: 'Low risk', value: data.low}
+      ];
+
+      stats.forEach(s => {
+        const stat = document.createElement('div');
+        stat.className = 'stat';
+        stat.innerHTML = `<h3>${s.value ?? '—'}</h3><p>${s.label}</p>`;
+        grid.appendChild(stat);
+      });
+
+      const note = document.createElement('div');
+      note.style.marginTop = '12px';
+      note.style.color = 'var(--muted)';
+      note.textContent = 'Last updated: ' + (data.last_updated || 'unknown');
+
+      container.appendChild(grid);
+      container.appendChild(note);
+    }
+
     async function loadSummary(){
       try{
-        const res = await fetch('/data/summary.json');
-        if(!res.ok) return;
+        const res = await fetch('/data/summary.json', {cache: 'no-store'});
+        if(!res.ok) throw new Error('no summary file');
         const data = await res.json();
-        document.getElementById('summary-text').textContent = data.summary || JSON.stringify(data);
-      }catch(e){console.log('no summary data',e)}
+        renderSummary(data);
+      }catch(e){
+        document.getElementById('summary-text').textContent = 'No data loaded. Replace this placeholder with your API or local data.';
+        console.log('summary load failed', e);
+      }
     }
+
     loadSummary();
   </script>
 </body>
