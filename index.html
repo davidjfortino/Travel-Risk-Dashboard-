@@ -5,21 +5,49 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Travel Risk Dashboard</title>
   <style>
-    :root{--bg:#f7f9fb;--card:#ffffff;--accent:#0ea5a4;--muted:#64748b}
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#eef2f6,#f7fbfc);color:#0f1724}
-    .card{background:var(--card);padding:36px;border-radius:12px;max-width:820px;width:94%;box-shadow:0 6px 30px rgba(2,6,23,0.06);border:1px solid rgba(15,23,36,0.04);text-align:center}
-    h1{margin:0 0 8px;font-size:22px}
-    p{margin:8px 0;color:var(--muted)}
-    .small{font-size:13px;color:var(--muted);margin-top:10px}
+    :root{--bg:#f3f7fb;--card:#ffffff;--accent:#0ea5a4;--muted:#64748b}
+    body{font-family:system-ui,Arial,Helvetica,sans-serif;margin:0;background:var(--bg);color:#071023}
+    header{padding:28px;text-align:center}
+    #app{max-width:1100px;margin:18px auto;padding:18px}
+    .card{background:var(--card);padding:18px;border-radius:10px;box-shadow:0 8px 30px rgba(2,6,23,0.06);border:1px solid rgba(15,23,36,0.04)}
+    #map{height:420px;border-radius:8px;background:linear-gradient(180deg,#fff,#f8fbfd);display:flex;align-items:center;justify-content:center;color:var(--muted);border:1px solid #e6eef6}
+    footer{max-width:1100px;margin:18px auto;text-align:center;color:var(--muted);font-size:13px}
   </style>
 </head>
 <body>
-  <main class="card">
+  <header>
     <h1>Travel Risk Dashboard</h1>
-    <p>This is the Travel Risk Dashboard landing page. Your dashboard content will appear here.</p>
-    <div class="small">If you expected a different page, tell me what to put here and I will update it.</div>
-    <div class="small">Last updated: 2026-06-23 12:30 UTC</div>
-    <!-- rebuild-trigger: 2026-06-23T12:30:00Z -->
+    <p style="color:var(--muted);margin-top:6px">Interactive dashboard — data and charts will appear below.</p>
+  </header>
+  <main id="app">
+    <div class="card" id="summary">
+      <h2 style="margin-top:0">Summary</h2>
+      <p id="summary-text">No data loaded. Replace this placeholder with your API or local data.</p>
+    </div>
+
+    <div style="height:18px"></div>
+
+    <div class="card">
+      <h2 style="margin-top:0">Map / Charts</h2>
+      <div id="map">Map and charts placeholder</div>
+    </div>
   </main>
+
+  <footer>
+    <div>Admin: edit <code>/index.html</code> on the main branch to update this page.</div>
+  </footer>
+
+  <script>
+    // Small example: load a JSON from /data/summary.json if present
+    async function loadSummary(){
+      try{
+        const res = await fetch('/data/summary.json');
+        if(!res.ok) return;
+        const data = await res.json();
+        document.getElementById('summary-text').textContent = data.summary || JSON.stringify(data);
+      }catch(e){console.log('no summary data',e)}
+    }
+    loadSummary();
+  </script>
 </body>
 </html>
